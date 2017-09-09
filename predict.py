@@ -71,4 +71,7 @@ plt.show()
 
 sns.pairplot(data,hue='Date')
 
-
+g=sns.PairGrid(data);
+g.map_diag(sns.kdeplot, shade=True)
+g.map_offdiag(sns.kdeplot, shade=True, shade_lowest=False, cmap='coolwarm', n_levels=6);
+plt.show()
