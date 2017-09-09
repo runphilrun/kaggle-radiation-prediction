@@ -36,7 +36,7 @@ data.rename(columns={'UNIXTime':'Date','Time':'Time of Day','WindDirection(Degre
 
 # convert times to datetime objects
 data['Date'] = pd.to_datetime(data['Date'],unit='s').dt.date
-data['Time of Day'] = pd.to_datetime(data['Time of Day'],format='%H:%M:%S')
+data['Time of Day'] = pd.to_datetime(data['Time of Day'],format='%H:%M:%S').dt.time
 data['TimeSunRise'] = pd.to_datetime(data['TimeSunRise'],format='%H:%M:%S')
 data['TimeSunSet'] = pd.to_datetime(data['TimeSunSet'],format='%H:%M:%S')
 unitLabels={'Time of Day':'HST','Radiation':'W/m^2','Temperature':'K','Pressure':'Pa','Humidity':'\%','Wind Direction':'rad','Wind Speed':'m/s','TimeSunRise':'HST','TimeSunSet':'HST'}
@@ -50,6 +50,7 @@ data_bydate=data.groupby('Date')
 
 # radiation over long periods of time
 normalized_rad_per_day=data_bydate['Radiation'].sum()/data_bydate['Length of Day'].min()
+normalized_rad_per_day=normalized_rad_per_day/normalized_rad_per_day.max() # normalize 0-->1
 normalized_rad_per_day.plot(), plt.title('Normalized Radiation per Day')
 
 mean_temp_per_day=data_bydate['Temperature'].mean()
@@ -58,3 +59,16 @@ mean_humidity_per_day=data_bydate['Humidity'].mean()
 normalized_mean_humidity_per_day=mean_humidity_per_day/mean_humidity_per_day.max()
 normalized_mean_temp_per_day.plot()
 normalized_mean_humidity_per_day.plot()
+
+## convert time of day to just times not dates
+#data_bydate.loc[:,'Time of Day'] = data_bydate.loc[:,'Time of Day'].dt.time
+# plot radiation for time of day on same plot
+fig, ax = plt.subplots()
+for date, group in data_bydate:
+    ax.plot(group['Time of Day'], group['Radiation'], marker='.', linestyle='', ms=12, label=date)
+# ax.legend() # too many dates to show
+plt.show()
+
+sns.pairplot(data,hue='Date')
+
+
