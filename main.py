@@ -9,13 +9,16 @@ import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import matplotlib.pyplot as plt # plotting tools
 import seaborn as sns # advanced plotting tools
+from bokeh.plotting import figure, output_notebook, show # advanced and
+from bokeh.models import Range1d  # interactive plotting tools
 
 ## IMPORT FUNCTIONS
 import preprocessing
-import showme
+import explore
 
 ## INGEST DATA
 df, units = preprocessing.ingest_data('input/SolarPrediction.csv')
 print(df.head())
 
-# give the algorithm weather and calendar info for 2-3 days prior and let it predict a distribution over the course of a day. the answer is the area under that curve.
+## EXPLORE data
+explore.humidity(df)
