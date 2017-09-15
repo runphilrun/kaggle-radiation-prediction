@@ -11,14 +11,15 @@ import seaborn as sns # advanced plotting tools
 
 def humidity(df):
     '''Plot humidity vs radiation over time'''
-    df_month = df.groupby('Month')
-    df_day = df.groupby('Date')
-    df_hour = df.groupby('Hour')
-    plt.figure(figsize=(18, 16))
+    # df_month = df.groupby('Month')
+    # df_day = df.groupby('Date')
+    # df_hour = df.groupby('Hour')
+    plt.figure(figsize=(18, 6))
     plt.subplot(131)
-    ax_hh=sns.barplot(x='Hour',y='Humidity',data=df)
+    sns.barplot(x='Hour',y='Humidity',data=df)
     plt.subplot(132)
-    ax_dh=sns.barplot(x='Date',y='Humidity',data=df)
+    sns.barplot(x='Month',y='Humidity',data=df)
     plt.subplot(133)
-    ax_mh=sns.barplot(x='Month',y='Humidity',data=df)
+    sns.jointplot(x='Humidity',y='Radiation',data=df,kind='kde',cmap='coolwarm',n_levels=30,shade=True)
     sns.plt.show()
+    # https://stackoverflow.com/questions/32899463/how-can-i-overlay-two-graphs-in-seaborn
