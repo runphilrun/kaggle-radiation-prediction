@@ -17,8 +17,10 @@ def ingest_data(filename):
     '''
     # read csv file
     df = pd.read_csv(filename)
+
     # 'Data' column is unused. All elements contain the same value.
-    df.drop(['Data','WindDirection(Degrees)','Speed','Time'],axis=1,inplace=True)
+    # 'Time' is redundant and superseded by UNIXTime.
+    df.drop(['Data','Time'],axis=1,inplace=True)
 
     # interpret columns as appropriate data types to ensure compatibility
     df['UNIXTime']      = pd.to_datetime(df['UNIXTime'],unit='s')
@@ -26,12 +28,11 @@ def ingest_data(filename):
     df['Temperature']   = df['Temperature'].astype(float) # or int
     df['Pressure']      = df['Pressure'].astype(float)
     df['Humidity']      = df['Humidity'].astype(int) # or int
+    df['WindDirection(Degrees)'] = df['WindDirection(Degrees)'].astype(float)
+    df['Speed']         = df['Speed'].astype(float)
     df['TimeSunRise']   = pd.to_datetime(df['TimeSunRise'],format='%H:%M:%S')
     df['TimeSunSet']    = pd.to_datetime(df['TimeSunSet'],format='%H:%M:%S')
-
-    # convert units to SI
-    df.loc[:,'Temperature'] = (df.loc[:,'Temperature'] + 459.67)*5.0/9.0 # degrees F --> Kelvin
-    df.loc[:,'Pressure'] *= 3386.0 # inches Hg --> Pascal
+    df.rename(columns={'WindDirection(Degrees)': 'WindDirection', 'Speed': 'WindSpeed'}, inplace=True)
 
     # compute length of each day
     df['DayLength'] = (df['TimeSunSet']-df['TimeSunRise'])/np.timedelta64(1, 's')
@@ -47,11 +48,6 @@ def ingest_data(filename):
     hawaii=pytz.timezone('Pacific/Honolulu')
     df.index=df.index.tz_localize(pytz.utc).tz_convert(hawaii)
 
-    # break down UNIX time into calendar and time components
-    df['Month'] = df.index.strftime('%m').astype(int)
-    df['Day'] = df.index.strftime('%j').astype(int)
-    df['Hour'] = df.index.hour # for easier grouping and math
-
     # assign unit labels to data keys
-    units={'Radiation':'W/m^2','Temperature':'K','Pressure':'Pa','Humidity':'\%','DayLength':'sec'}
+    units={'Radiation':'W/m^2','Temperature':'F','Pressure':'in Hg','Humidity':'\%','DayLength':'sec'}
     return df, units
