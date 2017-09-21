@@ -19,10 +19,9 @@ import brains
 df, units = preprocessing.ingest_data('input/SolarPrediction.csv')
 print(df.head())
 
-df['Month'] = df.index.month # add month to view correlation
+df['WeekOfYear'] = df.index.week # add datetime components to view correlation
 plt.figure(figsize=(7,7))
 explore.corrPairs(df)
-df.drop(['Month'], axis=1, inplace=True) # drop temporary column, dates are indexed
 df.drop(['WindDirection','WindSpeed'], axis=1, inplace=True) # drop irrelevant features
 
 ## EXPLORE data
@@ -34,3 +33,5 @@ for feature in feature_list[1:]: # radiation vs feature
 # bivariate density matrix
 explore.corrMap(df,feature_list)
 plt.show()
+
+df['TimeOfDay'] = df.index.hour # add time of day to correlation
