@@ -7,13 +7,10 @@ September 10, 2017
 import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import matplotlib.pyplot as plt # plotting tools
-from bokeh.plotting import figure, output_notebook, show # advanced and
-from bokeh.models import Range1d  # interactive plotting tools
+from sklearn.linear_model import LinearRegression # Linear regression ML algorithm
 
 ## IMPORT FUNCTIONS
-import preprocessing
-import explore
-import brains
+import preprocessing, explore, brains
 
 ## INGEST DATA
 df, units = preprocessing.ingest_data('input/SolarPrediction.csv')
@@ -24,7 +21,7 @@ plt.figure(figsize=(7,7))
 explore.corrPairs(df)
 df.drop(['WindDirection','WindSpeed'], axis=1, inplace=True) # drop irrelevant features
 
-## EXPLORE data
+### EXPLORE data
 feature_list=['Radiation','Humidity','Temperature','Pressure']
 for feature in feature_list[1:]: # radiation vs feature
     plt.figure(figsize=(18, 6))
@@ -35,3 +32,6 @@ explore.corrMap(df,feature_list)
 plt.show()
 
 df['TimeOfDay'] = df.index.hour # add time of day to correlation
+
+clf, model, accuracy, X_test, y_test=brains.train_model(df,LinearRegression(),debug=True)
+print('Accuracy: %s percent'%str(accuracy*100))
