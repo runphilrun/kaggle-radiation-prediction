@@ -51,7 +51,7 @@ def train_model(X,y,clf,debug=False):
     inputs:
         X       as array        features
         y       as array        label(s)
-        clf     as sci-kit learn classifier (untrained)
+        clf     as scikit-learn classifier (untrained)
     returns:
         clf     as trained classifier
         accuracy  as float
@@ -66,6 +66,19 @@ def go(x,y,algorithm,debug=True):
     clf, model, accuracy, X_test, y_test=train_model(x,y,algorithm,debug=True)
     print('Accuracy: %s percent'%str(accuracy*100))
 
-    plot_test(clf,X_test,y_test)
-    plot_real(clf,x,y,df.index.values)
+    if debug:
+        plot_test(clf,X_test,y_test)
+        plot_real(clf,x,y,df.index.values)
     return
+
+def optimize_randomforest(x,y,try_n=10,try_f='auto',try_s=1):
+    ''' Find best combo of tunable params for random forest regressor. '''
+    best_score = float('-inf') # initialize score
+    for n in try_n:
+        for f in try_f:
+            for s in try_s:
+                clf = RandomForestRegressor(oob_score=True,n_estimators=n,max_features=f,min_samples_leaf=s,n_jobs=-1)
+                clf.fit(x,y)
+                if clf.oob_score_ > best_score:
+                    best_score, best_clf, best_n, best_f, best_s = clf.oob_score_, clf, n, f, s
+    return clf, best_n, best_f, best_s
